@@ -48,7 +48,7 @@ The solver receives only question type and question HTML. It does not receive th
 
 The triage prompt sees the question, stored key and solution, deterministic findings, both blind solves, and comments in clearly marked quoted data. A tool schema restricts verdict and repair values to `taxonomy.json`. It returns one reply per report ID.
 
-**Technical term: structured LLM orchestration.** `engine/llm.py` uses Anthropic’s Messages API and a forced tool schema, then validates the response with Pydantic. Runtime code checks the taxonomy too. The system prompt and user evidence are separate API fields. The product prompts live in `prompts/` and are copied into `PROMPTS.md`.
+**Technical term: structured LLM orchestration.** `engine/llm.py` uses Groq chat completions with a forced function-tool schema, then validates the response with Pydantic. Runtime code checks the taxonomy too. The system prompt and user evidence are separate API messages. The product prompts live in `prompts/` and are copied into `PROMPTS.md`.
 
 ### Stage 6 — inspect the answer three ways and guard edits
 
@@ -81,7 +81,7 @@ The intended extra pass solves every question twice, even if it has no report, a
 | Tool or library | Why it is here | Alternative and trade-off |
 |---|---|---|
 | Python 3.11+ | Small readable engine; strong HTML, JSON, and API libraries. Local build used Python 3.12.14. | Node would simplify sharing code with the console, but the requested Python ML/LLM ecosystem and beginner-friendly scripts favor Python. |
-| Anthropic Python SDK | Direct Messages API access for Claude, structured tool results, and no orchestration framework. The example model is selected from Anthropic's active model list; model lifecycle changes need review before a run ([official lifecycle table](https://docs.anthropic.com/en/docs/about-claude/model-deprecations)). | LangChain would add abstractions and more moving pieces; direct SDK calls make the blind/triage boundary visible. The SDK path has not been exercised because there is no key. |
+| Groq Python SDK | Direct chat-completions access with function tool results, using Groq API credentials. The example model `openai/gpt-oss-120b` is listed by Groq as supporting tool use; check the live model list before running because offerings change ([tool-use docs](https://console.groq.com/docs/tool-use/overview), [model list](https://console.groq.com/docs/models)). | Anthropic's SDK was the initial implementation, but the user requested Groq. LangChain would add abstractions and more moving pieces; direct SDK calls keep the blind/triage boundary visible. The Groq call path has not been exercised because there is no key. |
 | Pydantic 2 | Validates structured model output and catches missing/extra/wrongly typed fields. | Hand-written checks are smaller but easier to make inconsistent. Pydantic validation still does not prove that an answer is correct. |
 | BeautifulSoup 4 + lxml | Tolerant parsing for messy production HTML; MathML subtrees are retained for display. | A custom standard-library parser was tried initially, then replaced when its option handling missed adjacent labels. XML-only parsing is too strict for inconsistent HTML. |
 | pytest | Focused tests for guards, malformed outputs, data grouping, and solver isolation. | Manual-only review would miss repeatable failures. Tests cannot establish subject-matter accuracy without ground truth. |
@@ -90,12 +90,12 @@ The intended extra pass solves every question twice, even if it has no report, a
 | `uv` (local environment setup) | Used here to create `.venv` and install dependencies. | `pip` is documented as a familiar alternative. `uv` is not required at application runtime. |
 | Git | Tracks phases and makes mistakes/revisions reviewable. | The repo is local only; it has not been pushed to GitHub. |
 
-There is no LangChain, application server, database, or model call in the browser. The default model is configurable with `ANTHROPIC_MODEL`; the example selects Claude Haiku 4.5 to aim for lower inference cost, but no call cost or latency has been measured.
+There is no LangChain, application server, database, or model call in the browser. The default model is configurable with `GROQ_MODEL`; no call cost or latency has been measured.
 
 ## 4. ML and LLM concepts with project examples
 
 - **LLM:** a model that predicts useful text from context. Here it may solve a physics problem and classify a report, but can still make a confident arithmetic error.
-- **API:** a structured way for one program to request another service. `engine/llm.py` sends a prompt and receives a tool-shaped response from Anthropic.
+- **API:** a structured way for one program to request another service. `engine/llm.py` sends a prompt and receives a function-tool response from Groq.
 - **Prompt:** the instructions and evidence sent to a model. `solver_v1.md` says solve the question; `triage_v1.md` explains how to review the reports.
 - **System vs user prompt:** system text defines the task and rules; user input carries the question, comments, and evidence. Student comments belong in the user data, never in the trusted system instructions.
 - **Structured output / JSON schema:** instead of accepting free-form prose, the triage call must return fields such as verdict, route, edit, confidence, and per-report reply. Code validates the object and taxonomy values.
@@ -105,14 +105,14 @@ There is no LangChain, application server, database, or model call in the browse
 - **Guardrail:** a code rule outside the model prompt. For example, answer-key edits require solver/solution agreement even if the model asks to auto-apply.
 - **Confidence:** a model’s self-reported certainty, not a measured probability of correctness. The 0.95 threshold is a conservative initial setting; it needs calibration against reviewed cases.
 - **Human-in-the-loop:** the model prepares evidence and an edit; faculty decides. The console’s local approval does not write to production.
-- **Temperature:** a sampling setting that can make some model outputs more or less varied. This code does not pass a temperature parameter; current Claude model/API behavior changes over time, and variation would not replace independent verification.
+- **Temperature:** a sampling setting that can make some model outputs more or less varied. This code does not pass a temperature parameter; provider/model behavior changes over time, and variation would not replace independent verification.
 - **Hallucination:** plausible but unsupported output. A model could invent a missing value, misread an option, or claim a fix was applied. The prompt forbids inventing; edit guards and faculty review provide additional checks.
 - **Caching:** store a successful response so reruns with identical model, prompt, input, and schema do not repeat the same paid request. `engine/cache.py` hashes that full request identity. Prompt or model changes create a new cache key.
 - **Token cost:** API usage depends on input and output tokens for each call and the model’s current rate. This project records no cost yet. Grouping reports, deterministic short-circuits, caching, and limiting solver runs to needed questions are the cost controls; estimate cost from measured token usage once credentials exist.
 
 ## 5. Four real data walkthroughs
 
-These are manual walkthroughs of the provided source data, not completed AI outputs. The model pipeline did not run, so no claimed verdict, confidence, or reply below comes from Claude.
+These are manual walkthroughs of the provided source data, not completed AI outputs. The model pipeline did not run, so no claimed verdict, confidence, or reply below comes from Groq.
 
 ### A. Likely answer-key defect — R001 / LCR question
 
@@ -191,7 +191,7 @@ The parser first missed choices when the next `(B)` label touched the preceding 
 
 ### Why this stack?
 
-Python keeps the engine short and works with Anthropic’s SDK, Pydantic, BeautifulSoup, and pytest. Pydantic makes shape errors visible, but does not validate physics. Vanilla JS/CSS is sufficient for a static JSON-driven console and avoids a build system. The trade-off is a localStorage-only audit and no multi-user persistence. I avoided LangChain because the flow is a small sequence of explicit calls and checks.
+Python keeps the engine short and works with Groq's SDK, Pydantic, BeautifulSoup, and pytest. Pydantic makes shape errors visible, but does not validate physics. Vanilla JS/CSS is sufficient for a static JSON-driven console and avoids a build system. The trade-off is a localStorage-only audit and no multi-user persistence. I avoided LangChain because the flow is a small sequence of explicit calls and checks.
 
 ### Why precomputed results?
 
@@ -240,7 +240,7 @@ It can make algebra or unit errors, misread MathML, assume a conventional diagra
 - `engine/answer_checks.py`: conservative stored-solution answer extraction and comparison.
 - `engine/schemas.py`: Pydantic output shapes.
 - `engine/cache.py`: disk cache keyed by request hash.
-- `engine/llm.py`: `.env` loading, Anthropic client, blind solve, and grouped triage.
+- `engine/llm.py`: `.env` loading, Groq client, blind solve, and grouped triage.
 - `engine/guards.py`: scoped, surgical, high-confidence edit validation.
 - `engine/run_pipeline.py`: report-level pipeline and result writers; needs a real key.
 - `engine/run_unreported.py`: all-question solver scan and candidate writer; needs a real key.
@@ -259,7 +259,7 @@ It can make algebra or unit errors, misread MathML, assume a conventional diagra
 
 ## Known limitations of this build
 
-1. No Anthropic call has run; there are no real `results.json` decisions, student replies, confidence scores, or live deployment.
+1. No Groq call has run; there are no real `results.json` decisions, student replies, confidence scores, or live deployment.
 2. The model, prompts, tool schema, and runtime call path have not been validated against the live API or ground truth.
 3. The deterministic checks are deliberately simple: the markup leak and junk detectors do not understand every HTML/MathML dialect or every kind of noise. Four source records contain MathML fragments that fail strict XML parsing.
 4. Option splitting expects recognizable `(A)`–`(D)` labels. It can be confused by unusual markup, nested labels, or prose that happens to look like an option.

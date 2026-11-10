@@ -8,4 +8,4 @@ I would never let the system auto-author a missing diagram, invent a distractor,
 
 **Beyond the brief:** use question exposure counts to estimate how many students may see a reported defect before it is fixed. That can make urgency reflect actual student impact, while keeping faculty review in control.
 
-**Current limitation:** the engine and console are implemented, but this workspace had no Anthropic API key. No AI verdicts, confidence scores, student replies, or result file have been generated. The 0.95 auto threshold is a cautious initial setting and still needs calibration on adjudicated examples.
+**Current limitation:** the engine and console are implemented, but this workspace had no Groq API key. No AI verdicts, confidence scores, student replies, or result file have been generated. The 0.95 auto threshold is a cautious initial setting and still needs calibration on adjudicated examples.

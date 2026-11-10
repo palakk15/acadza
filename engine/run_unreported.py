@@ -9,7 +9,7 @@ from pathlib import Path
 from .answer_checks import compare_answers
 from .checks import deterministic_checks, findings_as_dicts
 from .data import group_reports, load_dataset
-from .llm import ClaudeCalls, load_local_env
+from .llm import GroqCalls, load_local_env
 
 
 def main() -> None:
@@ -18,7 +18,7 @@ def main() -> None:
     questions, reports, _taxonomy = load_dataset(root / "data")
     cases = group_reports(questions, reports)
     try:
-        client = ClaudeCalls(root, root / "data" / "llm_cache", os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"))
+        client = GroqCalls(root, root / "data" / "llm_cache", os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"))
     except RuntimeError as error:
         raise SystemExit(f"Cannot run the all-question solver scan: {error}") from error
     candidates: list[dict] = []

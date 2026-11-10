@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from engine.llm import ClaudeCalls
+from engine.llm import GroqCalls
 
 
 def test_blind_solver_receives_only_question_and_type(tmp_path: Path):
-    calls = ClaudeCalls.__new__(ClaudeCalls)
+    calls = GroqCalls.__new__(GroqCalls)
     calls.prompts = Path(__file__).resolve().parents[1] / "prompts"
     seen = []
     calls._tool_call = lambda operation, system, payload, schema: (seen.append((operation, payload)) or ({"answer": "A"}, False))

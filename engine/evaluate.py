@@ -8,7 +8,7 @@ from pathlib import Path
 def main() -> None:
     path = Path(__file__).resolve().parents[1] / "results.json"
     if not path.exists():
-        print("results.json does not exist. Run the real LLM pipeline after setting ANTHROPIC_API_KEY.")
+        print("results.json does not exist. Run the real LLM pipeline after setting GROQ_API_KEY.")
         return
     results = json.loads(path.read_text(encoding="utf-8"))
     print(f"Reports in results.json: {len(results)}")

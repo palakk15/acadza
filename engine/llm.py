@@ -1,4 +1,4 @@
-"""Minimal Anthropic Messages API wrapper with deterministic disk caching."""
+"""Minimal Groq chat-completions wrapper with deterministic disk caching."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from anthropic import Anthropic
+from groq import Groq
 
 from .cache import DiskCache
 from .comments import quote_comment
@@ -60,13 +60,12 @@ def _schema_for_triage(taxonomy: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-class ClaudeCalls:
+class GroqCalls:
     def __init__(self, project_root: Path, cache_dir: Path, model: str) -> None:
         load_local_env(project_root)
-        import os
-        if not os.getenv("ANTHROPIC_API_KEY"):
-            raise RuntimeError("ANTHROPIC_API_KEY is missing. Set it in .env or the process environment; no LLM calls were made.")
-        self.client = Anthropic()
+        if not os.getenv("GROQ_API_KEY"):
+            raise RuntimeError("GROQ_API_KEY is missing. Set it in .env or the process environment; no LLM calls were made.")
+        self.client = Groq()
         self.cache = DiskCache(cache_dir)
         self.model = model
         self.prompts = project_root / "prompts"
@@ -75,18 +74,25 @@ class ClaudeCalls:
         request = {"model": self.model, "operation": operation, "system": system, "input": user_payload, "schema": schema}
 
         def call() -> dict:
-            response = self.client.messages.create(
+            response = self.client.chat.completions.create(
                 model=self.model,
-                max_tokens=1300,
-                system=system,
-                messages=[{"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)}],
-                tools=[{"name": "submit_result", "description": "Return the requested structured result.", "input_schema": schema}],
-                tool_choice={"type": "tool", "name": "submit_result"},
+                max_completion_tokens=1800,
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
+                ],
+                tools=[{"type": "function", "function": {
+                    "name": "submit_result",
+                    "description": "Return the requested structured result.",
+                    "parameters": schema,
+                }}],
+                tool_choice={"type": "function", "function": {"name": "submit_result"}},
             )
-            for block in response.content:
-                if block.type == "tool_use":
-                    return block.input
-            raise RuntimeError("Claude returned no structured tool result.")
+            message = response.choices[0].message
+            for call in message.tool_calls or []:
+                if call.function.name == "submit_result":
+                    return json.loads(call.function.arguments)
+            raise RuntimeError("Groq returned no structured tool result.")
 
         return self.cache.get_or_create(request, call)
 

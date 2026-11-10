@@ -1,10 +1,10 @@
 # Run this project
 
-This repository is a static faculty review console plus a Python triage engine. The console reads **precomputed** files and never calls an LLM from the browser. A local Anthropic API key is required only to run the engine and create `results.json`.
+This repository is a static faculty review console plus a Python triage engine. The console reads **precomputed** files and never calls an LLM from the browser. A local Groq API key is required only to run the engine and create `results.json`.
 
 ## Current build status
 
-The parser, deterministic checks, answer checks, safety guards, tests, and offline console are implemented. `results.json` has not been generated: no `ANTHROPIC_API_KEY` was available during this build, and model results are not fabricated. The console therefore labels verdicts and replies as pending. The all-question solver scan and `unreported_defects.json` are also pending a real model run.
+The parser, deterministic checks, answer checks, safety guards, tests, and offline console are implemented. `results.json` has not been generated: no `GROQ_API_KEY` was available during this build, and model results are not fabricated. The console therefore labels verdicts and replies as pending. The all-question solver scan and `unreported_defects.json` are also pending a real model run.
 
 The current no-LLM scan found 11 deterministic findings across 9 reported questions, including 4 records with malformed MathML. It found no candidate findings on unreported questions. These are review signals, not ground-truth defect labels.
 
@@ -17,7 +17,7 @@ Requires Python 3.11 or newer.
 py -3.11 -m venv .venv
 .venv\Scripts\python.exe -m pip install -e ".[dev]"
 Copy-Item .env.example .env
-# Add your Anthropic key to .env in a local editor; never commit it.
+# Add your Groq key to .env in a local editor; never commit it.
 .venv\Scripts\python.exe -m engine.inspect_data
 .venv\Scripts\python.exe -m engine.deterministic_scan
 .venv\Scripts\python.exe -m pytest -q
@@ -31,7 +31,7 @@ Generate model-backed results (requires a funded API key and network access):
 .venv\Scripts\python.exe -m engine.evaluate
 ```
 
-The pipeline performs two separate cached blind solves and one grouped triage call for each reported question. Successful calls are cached under `data/llm_cache/`. It writes `results.json` and `data/internal_cases.json`. The solver does not receive the key, solution, or student comments. If the API key is absent, the pipeline exits before making a request. `engine.run_unreported` reuses the cache where possible, solves every supplied question twice, and writes faculty-review candidates to `data/unreported_defects.json`.
+The pipeline performs two separate cached blind solves and one grouped triage call for each reported question. Successful calls are cached under `data/llm_cache/`. It writes `results.json` and `data/internal_cases.json`. The solver does not receive the key, solution, or student comments. The default model is `openai/gpt-oss-120b`; set `GROQ_MODEL` to another Groq-supported tool-calling model if needed. If the API key is absent, the pipeline exits before making a request. `engine.run_unreported` reuses the cache where possible, solves every supplied question twice, and writes faculty-review candidates to `data/unreported_defects.json`.
 
 ## Open the static console
 
@@ -48,7 +48,7 @@ For a static Vercel, Netlify, or GitHub Pages deployment, publish the **reposito
 ## Repository map
 
 - `engine/parser.py`, `data.py`, `comments.py`, `checks.py`, `markup.py`, `answer_checks.py`: parsing, grouping, input isolation, strict MathML validation, and deterministic evidence.
-- `engine/llm.py`, `cache.py`, `run_pipeline.py`: Anthropic calls, disk cache, and pipeline orchestration.
+- `engine/llm.py`, `cache.py`, `run_pipeline.py`: Groq calls, disk cache, and pipeline orchestration.
 - `engine/guards.py`: code-level controls before an edit can route to auto-apply.
 - `console/`: responsive static faculty console.
 - `prompts/`: versioned product prompts and change log; `PROMPTS.md` copies them verbatim.

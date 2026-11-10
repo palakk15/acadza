@@ -11,7 +11,7 @@ from .answer_checks import compare_answers
 from .comments import inspect_comment
 from .data import group_reports, load_dataset
 from .guards import validate_and_apply
-from .llm import ClaudeCalls, load_local_env
+from .llm import GroqCalls, load_local_env
 
 
 def main() -> None:
@@ -19,9 +19,9 @@ def main() -> None:
     load_local_env(root)
     questions, reports, taxonomy = load_dataset(root / "data")
     cases = group_reports(questions, reports)
-    model = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
+    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
     try:
-        client = ClaudeCalls(root, root / "data" / "llm_cache", model)
+        client = GroqCalls(root, root / "data" / "llm_cache", model)
     except RuntimeError as error:
         raise SystemExit(f"Cannot run the LLM pipeline: {error}") from error
     results: list[dict] = []
