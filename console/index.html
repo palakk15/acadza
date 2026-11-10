@@ -30,7 +30,7 @@
     </aside>
 
     <section class="case-area" aria-labelledby="case-title">
-      <div id="load-state" class="load-state" role="status"></div>
+      <div id="load-state" class="load-state" role="status">Loading the supplied question and report data…</div>
       <div id="case-content" hidden>
         <div class="case-topline"><div class="breadcrumbs"><span>Report queue</span><span aria-hidden="true">/</span><span id="case-subject">—</span></div><div class="case-navigation"><button id="previous" class="icon-button" aria-label="Previous case">↑</button><button id="next" class="icon-button" aria-label="Next case">↓</button><span id="case-position">—</span></div></div>
         <div class="case-title-row"><div><div class="case-ident"><span id="case-qid" class="qid">QUESTION ID</span><span id="case-type" class="type-pill">SCQ</span><span id="case-level" class="type-pill muted">—</span></div><h2 id="case-title">Question review</h2><p id="case-meta" class="case-meta"></p></div><div id="verdict-badge" class="verdict-badge pending"><span class="badge-dot"></span><span id="verdict-text">Analysis pending</span></div></div>
@@ -55,6 +55,6 @@
     </section>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="./app.js" defer></script>
+  <script src="./app.js?v=2" defer></script>
 </body>
 </html>

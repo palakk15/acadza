@@ -12,7 +12,10 @@
   let state = loadState();
 
   function loadState() {
-    try { return JSON.parse(localStorage.getItem(stateKey)) || { actions: {}, audit: {} }; }
+    try {
+      const saved = JSON.parse(localStorage.getItem(stateKey)) || {};
+      return { actions: saved.actions && typeof saved.actions === "object" ? saved.actions : {}, audit: saved.audit && typeof saved.audit === "object" ? saved.audit : {} };
+    }
     catch { return { actions: {}, audit: {} }; }
   }
   function saveState() { localStorage.setItem(stateKey, JSON.stringify(state)); }
@@ -58,7 +61,7 @@
   }
   function getPayload(item) { return item.question[item.question.questionType] || {}; }
   function displayAnswer(answer) { return Array.isArray(answer) ? answer.join(", ") : String(answer ?? "Not set"); }
-  function caseAction(item) { return state.actions[item.id] || {}; }
+  function caseAction(item) { return (state.actions || {})[item.id] || {}; }
   function resultRoute(item) { return caseAction(item).route || item.result?.route || "needs"; }
   function isResolved(item) { return Boolean(caseAction(item).action); }
 
@@ -309,11 +312,15 @@
       fetchJson("../data/unreported_defects.json", null),
     ]);
     cases = makeCases(questions, reports, results, internal);
+    if (cases.length) {
+      const firstInQueue = [...cases].sort((a, b) => urgency(b) - urgency(a) || b.reports.length - a.reports.length || a.id.localeCompare(b.id))[0];
+      selected = cases.findIndex(item => item.id === firstInQueue.id);
+    }
     const analyzed = cases.some(item => item.result);
     $("#load-state").innerHTML = analyzed
       ? `<strong>${results.length} precomputed report decisions loaded.</strong> This console does not call an LLM. Approvals and audit entries are stored locally in this browser.`
       : `<strong>LLM analysis is pending.</strong> This console is offline and makes no model calls. It shows the supplied questions and comments; no verdicts or repairs have been invented.`;
     renderUnreported(unreported); renderQueue(); renderSelected();
   }
-  boot().catch(error => { $("#load-state").textContent = `Could not load assignment data: ${error.message}`; });
+  boot().catch(error => { const status = $("#load-state"); status.textContent = `Could not load assignment data: ${error.message}`; console.error(error); });
 })();

@@ -4,14 +4,13 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass, field
-import html
 import re
 from typing import Any
 
 from bs4 import BeautifulSoup
-from lxml import etree
 
 from .parser import parse_question
+from .markup import mathml_is_valid
 
 
 @dataclass
@@ -35,19 +34,21 @@ def _target(question: dict[str, Any], field_name: str) -> tuple[dict, str]:
 
 
 def _mathml_valid(markup: str) -> bool:
-    # BeautifulSoup is deliberately forgiving and repairs broken fragments.
-    # Strictly parse the original MathML snippets before using it for HTML checks.
-    fragments = re.findall(r"<math\b[^>]*>.*?</math\s*>", markup or "", re.IGNORECASE | re.DOTALL)
-    for fragment in fragments:
-        try:
-            etree.fromstring(html.unescape(fragment).encode("utf-8"))
-        except etree.XMLSyntaxError:
-            return False
-    return True
+    return mathml_is_valid(markup)
 
 
 def _symbols(value: str) -> list[str]:
     return re.findall(r"\d+(?:\.\d+)?|[^\w\s<>/]+", value)
+
+
+def _valid_answer_shape(question_type: str, answer: Any) -> bool:
+    if question_type == "scq":
+        return isinstance(answer, str) and answer in "ABCD"
+    if question_type == "mcq":
+        return isinstance(answer, list) and bool(answer) and all(isinstance(item, str) and item in "ABCD" for item in answer)
+    if question_type == "integerQuestion":
+        return re.fullmatch(r"-?\d+(?:\.\d+)?", str(answer or "")) is not None
+    return False
 
 
 def _reject(outcomes: list[dict[str, str]], code: str, detail: str, current: dict) -> GuardResult:
@@ -77,6 +78,8 @@ def validate_and_apply(
         if "answer" not in repair.get("fields", []):
             return _reject(outcomes, "field_scope", "This repair cannot change the answer field.", current)
         kind = current.get("questionType")
+        if not _valid_answer_shape(kind, new_answer):
+            return _reject(outcomes, "answer_shape", "Proposed answer does not match the question type.", current)
         payload = current.get(kind) or {}
         payload["answer"] = new_answer
         outcomes.append({"guard": "field_scope", "status": "passed", "detail": "answer"})
@@ -99,6 +102,8 @@ def validate_and_apply(
         if occurrences != 1:
             return _reject(outcomes, "find_once", f"Find text occurs {occurrences} times; exactly one is required.", current)
         changed = original.replace(find, replacement, 1)
+        if field_name == "answer" and not _valid_answer_shape(current.get("questionType", ""), changed):
+            return _reject(outcomes, "answer_shape", "Edited answer does not match the question type.", current)
         if len(changed) > max(200, len(original) * 1.35) or len(changed) > 1200:
             return _reject(outcomes, "edit_size", "Proposed replacement is too large for a surgical edit.", current)
         ratio = (len(find) + len(replacement)) / max(1, len(original))

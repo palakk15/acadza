@@ -8,6 +8,7 @@ import re
 from typing import Any
 
 from .parser import ParsedQuestion, clean_question_html
+from .markup import mathml_is_valid
 
 
 @dataclass
@@ -40,6 +41,8 @@ def deterministic_checks(question: dict[str, Any], parsed: ParsedQuestion) -> li
     combined_text = f"{q_html}\n{sol_html}"
     if re.search(r"\\(?:frac|sqrt|begin|mathrm)\b|&lt;/?(?:div|span|math)", combined_text):
         findings.append(Finding("markup_leak", "medium", "Possible raw LaTeX or escaped HTML in content."))
+    if not mathml_is_valid(q_html) or not mathml_is_valid(sol_html):
+        findings.append(Finding("invalid_mathml", "high", "A MathML fragment is not well-formed XML; repair needs careful review."))
     if re.search(r"\(\s*(?:JEE|NEET|AIEEE|AIIMS)\s+(?:Main\s+)?\d{4}\s*\)", _plain(q_html), re.I):
         findings.append(Finding("exam_reference", "low", "Question contains an exam/source tag."))
     if re.search(r"\b(?:space for rough work|sample question|asdfgh)\b", _plain(combined_text), re.I):

@@ -37,3 +37,12 @@ def test_detects_reported_three_option_question():
     from engine.parser import parse_question
     findings = deterministic_checks(question, parse_question(question))
     assert any(item.code == "option_count" for item in findings)
+
+
+def test_detects_malformed_mathml_in_assignment_data():
+    root = Path(__file__).resolve().parents[1]
+    questions, _, _ = load_dataset(root / "data")
+    question = next(q for q in questions if q["_id"] == "622df25ab70e4b50e44ff837")
+    from engine.parser import parse_question
+    findings = deterministic_checks(question, parse_question(question))
+    assert any(item.code == "invalid_mathml" for item in findings)

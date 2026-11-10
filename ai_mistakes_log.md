@@ -11,3 +11,9 @@
 - **What happened:** The initial junk-comment rule labelled the valid report `wrong` as gibberish, and the forgiving HTML parser repaired a deliberately broken MathML fragment before the guard could reject it.
 - **How it was caught:** The first pytest run returned 2 failures out of 15, including explicit adversarial cases for valid short feedback and malformed MathML.
 - **Correction:** Restricted gibberish detection to clearly keyboard-mashed text and made MathML validation parse the original XML fragments strictly before the forgiving HTML parser runs. Rerun the suite after these fixes.
+
+## Console opened a middle-priority case on first load
+
+- **What happened:** The first browser render selected the first report in source-file order, while the visible queue was sorted by urgency. The position indicator showed 25 of 39, so the user landed on a middle-priority case instead of the first queue item.
+- **How it was caught:** I rendered the console in Firefox headless at desktop size and inspected the screenshot.
+- **Correction:** On data load, select the first case in the same urgency-sorted order as the queue, then rerender and verify the position.

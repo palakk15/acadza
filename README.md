@@ -1,3 +1,62 @@
+# Run this project
+
+This repository is a static faculty review console plus a Python triage engine. The console reads **precomputed** files and never calls an LLM from the browser. A local Anthropic API key is required only to run the engine and create `results.json`.
+
+## Current build status
+
+The parser, deterministic checks, answer checks, safety guards, tests, and offline console are implemented. `results.json` has not been generated: no `ANTHROPIC_API_KEY` was available during this build, and model results are not fabricated. The console therefore labels verdicts and replies as pending. The all-question solver scan and `unreported_defects.json` are also pending a real model run.
+
+The current no-LLM scan found 11 deterministic findings across 9 reported questions, including 4 records with malformed MathML. It found no candidate findings on unreported questions. These are review signals, not ground-truth defect labels.
+
+## Run locally
+
+Requires Python 3.11 or newer.
+
+```powershell
+# From the repository root
+py -3.11 -m venv .venv
+.venv\Scripts\python.exe -m pip install -e ".[dev]"
+Copy-Item .env.example .env
+# Add your Anthropic key to .env in a local editor; never commit it.
+.venv\Scripts\python.exe -m engine.inspect_data
+.venv\Scripts\python.exe -m engine.deterministic_scan
+.venv\Scripts\python.exe -m pytest -q
+```
+
+Generate model-backed results (requires a funded API key and network access):
+
+```powershell
+.venv\Scripts\python.exe -m engine.run_pipeline
+.venv\Scripts\python.exe -m engine.run_unreported
+.venv\Scripts\python.exe -m engine.evaluate
+```
+
+The pipeline performs two separate cached blind solves and one grouped triage call for each reported question. Successful calls are cached under `data/llm_cache/`. It writes `results.json` and `data/internal_cases.json`. The solver does not receive the key, solution, or student comments. If the API key is absent, the pipeline exits before making a request. `engine.run_unreported` reuses the cache where possible, solves every supplied question twice, and writes faculty-review candidates to `data/unreported_defects.json`.
+
+## Open the static console
+
+Serve the repository root so the console can fetch the adjacent data and precomputed output:
+
+```powershell
+.venv\Scripts\python.exe -m http.server 8000
+```
+
+Open `http://localhost:8000/console/`. The console works without a key and displays the real question/report data. Until `results.json` exists, it clearly labels AI verdicts, confidence, proposed edits, guards, replies, and unreported candidates as pending. Faculty approve/reject/edit records and audit entries are demo-local in browser storage; they do not update Acadza's source database.
+
+For a static Vercel, Netlify, or GitHub Pages deployment, publish the **repository root** so `/data/questions.json`, `/data/reports.json`, and `/results.json` are available at the paths used by `console/app.js`. Include only generated, reviewed precomputed outputs. No secret is needed by the deployed console. A public URL and recording have not been created from this workspace.
+
+## Repository map
+
+- `engine/parser.py`, `data.py`, `comments.py`, `checks.py`, `markup.py`, `answer_checks.py`: parsing, grouping, input isolation, strict MathML validation, and deterministic evidence.
+- `engine/llm.py`, `cache.py`, `run_pipeline.py`: Anthropic calls, disk cache, and pipeline orchestration.
+- `engine/guards.py`: code-level controls before an edit can route to auto-apply.
+- `console/`: responsive static faculty console.
+- `prompts/`: versioned product prompts and change log; `PROMPTS.md` copies them verbatim.
+- `tests/`: safety and data parsing checks.
+- `PRODUCT.md`, `refer.md`, `ai_mistakes_log.md`: product decisions, personal study guide, and caught implementation mistakes.
+
+---
+
 # Acadza AI Intern Assignment: "Report → Fix" Loop
 
 **Deadline:** as stated in the email you received. **AI tools:** allowed and expected. **Stack:** your choice.

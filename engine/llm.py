@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -23,8 +25,8 @@ def load_local_env(project_root: Path) -> None:
             continue
         key, value = line.split("=", 1)
         key, value = key.strip(), value.strip().strip('"\'')
-        if key and key not in __import__("os").environ:
-            __import__("os").environ[key] = value
+        if key and key not in os.environ:
+            os.environ[key] = value
 
 
 def _schema_for_triage(taxonomy: dict[str, Any]) -> dict[str, Any]:
@@ -77,7 +79,7 @@ class ClaudeCalls:
                 model=self.model,
                 max_tokens=1300,
                 system=system,
-                messages=[{"role": "user", "content": __import__("json").dumps(user_payload, ensure_ascii=False)}],
+                messages=[{"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)}],
                 tools=[{"name": "submit_result", "description": "Return the requested structured result.", "input_schema": schema}],
                 tool_choice={"type": "tool", "name": "submit_result"},
             )
@@ -100,7 +102,7 @@ class ClaudeCalls:
         }}
         return self._tool_call(f"blind_solver_run_{run_number}", system, payload, schema)
 
-    def triage(self, question: dict[str, Any], findings: list[dict], solvers: list[dict], reports: list[dict], taxonomy: dict) -> tuple[TriageProposal, bool]:
+    def triage(self, question: dict[str, Any], findings: list[dict], solvers: list[dict], reports: list[dict], taxonomy: dict, comment_flags: list[dict] | None = None) -> tuple[TriageProposal, bool]:
         system = (self.prompts / "triage_v1.md").read_text(encoding="utf-8")
         kind = question.get("questionType")
         content = question.get(kind) or {}
@@ -113,6 +115,7 @@ class ClaudeCalls:
             "deterministic_findings": findings,
             "blind_solver_results": solvers,
             "comments": comments,
+            "comment_flags": comment_flags or [],
             "allowed_verdicts": taxonomy["verdicts"],
             "allowed_repairs": taxonomy["repairs"],
         }

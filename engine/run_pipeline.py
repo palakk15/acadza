@@ -20,7 +20,10 @@ def main() -> None:
     questions, reports, taxonomy = load_dataset(root / "data")
     cases = group_reports(questions, reports)
     model = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
-    client = ClaudeCalls(root, root / "data" / "llm_cache", model)
+    try:
+        client = ClaudeCalls(root, root / "data" / "llm_cache", model)
+    except RuntimeError as error:
+        raise SystemExit(f"Cannot run the LLM pipeline: {error}") from error
     results: list[dict] = []
     internal_cases: list[dict] = []
 
@@ -36,7 +39,8 @@ def main() -> None:
         # question text and type; key, solution, and reports are excluded.
         solver_results = [client.solve_blindly(question, run_number=index)[0] for index in (1, 2)]
         answer_comparison = compare_answers(question, solver_results)
-        proposal, triage_cached = client.triage(question, findings + [{"code": "answer_comparison", **answer_comparison}], solver_results, group, taxonomy)
+        safe_reports = [{key: report[key] for key in ("reportId", "questionId", "source", "reportedAt", "comment")} for report in group]
+        proposal, triage_cached = client.triage(question, findings + [{"code": "answer_comparison", **answer_comparison}], solver_results, safe_reports, taxonomy, flags)
         solver_answers = list(answer_comparison["solver_answers"])
         # The answer-key guard treats the stored solution's explicit final answer
         # as a third independent vote. Missing or weak extraction forces review.
@@ -56,8 +60,12 @@ def main() -> None:
                 route = guard_result.route
                 if proposal.edit is None and proposal.new_answer is None:
                     route = "faculty_review"
-        else:
+        elif proposal.verdict in {"no_error", "already_fixed", "not_actionable"}:
             route = "no_change"
+        else:
+            # App, display, language, or taxonomy exceptions must not be
+            # silently auto-routed as content edits. Keep them reviewable.
+            route = "faculty_review" if proposal.route == "auto_apply" else proposal.route
 
         replies = {item.report_id: item.text for item in proposal.student_replies}
         expected_ids = {report["reportId"] for report in group}
@@ -92,7 +100,7 @@ def main() -> None:
                 "options": case["parsed"].options,
                 "question_type": case["parsed"].question_type,
             },
-            "reports": group,
+            "reports": safe_reports,
             "comment_flags": flags,
             "deterministic_findings": findings,
             "solver_results": solver_results,

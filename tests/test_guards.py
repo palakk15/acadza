@@ -96,6 +96,12 @@ def test_answer_change_also_requires_solution_agreement():
     assert any(item["guard"] == "solver_agreement" and item["status"] == "failed" for item in result.outcomes)
 
 
+def test_answer_change_rejects_value_invalid_for_question_type():
+    result = validate_and_apply(question(), proposal(repair="answer_key", edit=None, new_answer="E"), TAXONOMY, solver_answers=["E", "E", "E"])
+    assert not result.accepted
+    assert result.outcomes[-1]["guard"] == "answer_shape"
+
+
 def test_low_confidence_auto_proposal_is_downgraded():
     result = validate_and_apply(question(), proposal(confidence=0.72), TAXONOMY)
     assert result.route == "faculty_review"
