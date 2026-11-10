@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from html.parser import HTMLParser
 import re
 from typing import Any
+
+from bs4 import BeautifulSoup, NavigableString, Tag
 
 
 @dataclass
@@ -18,55 +19,33 @@ class ParsedQuestion:
     mathml_count: int
 
 
-class _QuestionHTML(HTMLParser):
-    """Drop presentation tags but serialize MathML tags so browsers can render it."""
+MATH_TAGS = {
+    "math", "mi", "mn", "mo", "mrow", "mfrac", "msup", "msub",
+    "mover", "munder", "munderover", "mtext", "mspace", "mstyle",
+    "mtable", "mtr", "mtd", "msqrt", "mfenced", "semantics",
+    "annotation", "mroot", "mpadded", "menclose", "mphantom",
+}
 
-    MATH_TAGS = {
-        "math", "mi", "mn", "mo", "mrow", "mfrac", "msup", "msub",
-        "mover", "munder", "munderover", "mtext", "mspace", "mstyle",
-        "mtable", "mtr", "mtd", "msqrt", "mfenced", "semantics",
-        "annotation", "mroot", "mpadded", "menclose", "mphantom",
-    }
 
-    def __init__(self) -> None:
-        super().__init__(convert_charrefs=True)
-        self.parts: list[str] = []
-        self.math_depth = 0
-        self.mathml_count = 0
-
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if tag == "math":
-            self.math_depth += 1
-            self.mathml_count += 1
-        if self.math_depth and tag in self.MATH_TAGS:
-            self.parts.append(self.get_starttag_text() or f"<{tag}>")
-        elif tag in {"br", "p", "div", "h1", "h2", "h3", "li"}:
-            self.parts.append(" ")
-
-    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if self.math_depth and tag in self.MATH_TAGS:
-            self.parts.append(self.get_starttag_text() or f"<{tag}/>")
-
-    def handle_endtag(self, tag: str) -> None:
-        if self.math_depth and tag in self.MATH_TAGS:
-            self.parts.append(f"</{tag}>")
-        if tag == "math" and self.math_depth:
-            self.math_depth -= 1
-        elif tag in {"p", "div", "h1", "h2", "h3", "li"}:
-            self.parts.append(" ")
-
-    def handle_data(self, data: str) -> None:
-        self.parts.append(data)
+def _readable(node: Tag | NavigableString) -> str:
+    """Turn layout HTML into text, but serialize each MathML subtree intact."""
+    if isinstance(node, NavigableString):
+        return str(node)
+    if node.name == "math":
+        return str(node)
+    children = "".join(_readable(child) for child in node.children)
+    if node.name in {"br", "p", "div", "h1", "h2", "h3", "li"}:
+        return f" {children} "
+    return children
 
 
 def clean_question_html(markup: str) -> tuple[str, int]:
     """Remove layout HTML, preserve MathML, and return readable text."""
-    parser = _QuestionHTML()
-    parser.feed(markup or "")
-    parser.close()
-    text = "".join(parser.parts)
+    soup = BeautifulSoup(markup or "", "lxml")
+    mathml_count = len(soup.find_all("math"))
+    text = _readable(soup)
     text = re.sub(r"[\t\r\n ]+", " ", text).strip()
-    return text, parser.mathml_count
+    return text, mathml_count
 
 
 _OPTION_LABEL = re.compile(r"\(([A-D])\)\s*", re.IGNORECASE)

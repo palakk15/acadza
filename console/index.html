@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f3">
+  <title>Acadza · Report review</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#case-title">Skip to selected case</a>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Acadza review home"><span class="brand-mark">A</span><span>acadza <small>faculty desk</small></span></a>
+    <div class="topbar-right"><span class="offline-pill"><i></i> Precomputed review</span><label class="reviewer">Reviewer <input id="reviewer" value="Faculty" maxlength="40" aria-label="Reviewer name"></label><button id="export-audit" class="button quiet" type="button">Export audit</button></div>
+  </header>
+  <main class="layout">
+    <aside class="sidebar" aria-label="Review queue">
+      <div class="queue-heading"><div><p class="eyebrow">WORKSPACE</p><h1>Report queue</h1></div><span id="queue-count" class="count-pill">—</span></div>
+      <p class="queue-intro">One card per question. Repeated reports rise in the queue because more students are affected.</p>
+      <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Find question or report" aria-label="Search queue"></label>
+      <div class="filter-list" role="group" aria-label="Filter queue">
+        <button class="filter active" data-filter="all"><span>All reports</span><b id="filter-all">—</b></button>
+        <button class="filter" data-filter="needs"><span>Needs review</span><b id="filter-needs">—</b></button>
+        <button class="filter" data-filter="auto"><span>Auto-applied</span><b id="filter-auto">—</b></button>
+        <button class="filter" data-filter="resolved"><span>Resolved here</span><b id="filter-resolved">—</b></button>
+      </div>
+      <div class="queue-label"><span>QUESTIONS</span><span>URGENCY ↓</span></div>
+      <nav id="queue" class="case-list" aria-label="Questions"></nav>
+      <div class="urgency-note"><span class="note-icon">↗</span><p><strong>How urgency works</strong><br>Confirmed answer-key defects first, then more reporters and high-impact structural issues. Cosmetic edits follow; no-change and junk reports come last.</p></div>
+    </aside>
+
+    <section class="case-area" aria-labelledby="case-title">
+      <div id="load-state" class="load-state" role="status"></div>
+      <div id="case-content" hidden>
+        <div class="case-topline"><div class="breadcrumbs"><span>Report queue</span><span aria-hidden="true">/</span><span id="case-subject">—</span></div><div class="case-navigation"><button id="previous" class="icon-button" aria-label="Previous case">↑</button><button id="next" class="icon-button" aria-label="Next case">↓</button><span id="case-position">—</span></div></div>
+        <div class="case-title-row"><div><div class="case-ident"><span id="case-qid" class="qid">QUESTION ID</span><span id="case-type" class="type-pill">SCQ</span><span id="case-level" class="type-pill muted">—</span></div><h2 id="case-title">Question review</h2><p id="case-meta" class="case-meta"></p></div><div id="verdict-badge" class="verdict-badge pending"><span class="badge-dot"></span><span id="verdict-text">Analysis pending</span></div></div>
+        <div class="case-grid">
+          <div class="main-column">
+            <section class="panel question-panel"><div class="panel-head"><div><p class="eyebrow">QUESTION PREVIEW</p><h3 id="preview-title">Stored question</h3></div><span class="rendered-label"><i></i> Rendered HTML + MathML</span></div><div id="question-preview" class="rendered-content"></div><div id="options-preview" class="options-grid"></div></section>
+            <section class="panel diff-panel"><div class="panel-head"><div><p class="eyebrow">PROPOSED CHANGE</p><h3>Before and after</h3></div><span id="diff-state" class="diff-state">No edit proposed</span></div><div id="diff-content" class="diff-content"><p class="empty-note">There is no model-backed edit for this case yet. The console does not invent one.</p></div></section>
+            <section class="panel solution-panel"><div class="panel-head"><div><p class="eyebrow">SOLUTION</p><h3>Stored explanation</h3></div></div><div id="solution-preview" class="rendered-content solution-content"></div></section>
+            <section class="panel reply-panel"><div class="panel-head"><div><p class="eyebrow">STUDENT EXPERIENCE</p><h3>Reply preview</h3></div></div><div id="reply-list" class="reply-list"></div></section>
+          </div>
+          <aside class="detail-column" aria-label="Case evidence and actions">
+            <section class="panel summary-panel"><p class="eyebrow">TRIAGE SUMMARY</p><h3 id="repair-heading">Awaiting analysis</h3><p id="evidence" class="evidence">This case has not been analyzed by the LLM pipeline.</p><div class="confidence-row"><span>Confidence</span><span id="confidence-text">—</span></div><div class="confidence-track"><span id="confidence-fill"></span></div><div id="repair-label" class="repair-label">No repair selected</div></section>
+            <section class="panel guards-panel"><div class="panel-head"><div><p class="eyebrow">SAFETY CHECKS</p><h3>Guard results</h3></div></div><ul id="guard-list" class="guard-list"></ul></section>
+            <section class="panel comments-panel"><div class="panel-head"><div><p class="eyebrow">STUDENT REPORTS</p><h3 id="reporter-heading">Comments</h3></div></div><div id="comment-list" class="comment-list"></div></section>
+            <section class="panel audit-panel"><div class="panel-head"><div><p class="eyebrow">LOCAL HISTORY</p><h3>Audit trail</h3></div><span class="local-tag">THIS BROWSER</span></div><ol id="audit-list" class="audit-list"></ol></section>
+          </aside>
+        </div>
+        <section class="action-bar" aria-label="Faculty actions"><div class="action-context"><span class="action-symbol">✓</span><span><span id="action-copy">Review the evidence before deciding.</span><small class="shortcut-help">J/K move · A approve · R reason · E edit</small></span></div><label class="reject-reason">Reject reason<textarea id="reject-reason" rows="1" placeholder="Required to reject"></textarea></label><div class="action-buttons"><button id="reject" class="button reject" type="button">Reject</button><button id="edit" class="button secondary" type="button">Edit suggestion</button><button id="approve" class="button primary" type="button">Approve</button><button id="undo" class="button quiet" type="button" hidden>Undo approval</button></div></section>
+        <section id="edit-form" class="edit-form panel" hidden aria-label="Edit suggestion"><div class="edit-header"><div><p class="eyebrow">EDIT BEFORE APPROVING</p><h3>Make a precise change</h3></div><button id="close-edit" class="icon-button" aria-label="Close edit form">×</button></div><div class="edit-fields"><label>Field<select id="edit-field"><option value="question">Question</option><option value="solution">Solution</option><option value="answer">Answer</option></select></label><label>Find<input id="edit-find" type="text"></label><label>Replace with<input id="edit-replace" type="text"></label></div><div class="edit-footer"><span id="edit-hint">Changes are saved to this browser’s audit log only.</span><button id="save-edit" class="button primary" type="button">Save and approve</button></div></section>
+        <section class="panel unreported-panel"><div class="panel-head"><div><p class="eyebrow">WIDER CONTENT HEALTH</p><h3>Unreported candidates</h3></div><span id="unreported-count" class="count-pill">—</span></div><p id="unreported-copy" class="empty-note">No cross-question solver scan has been generated yet. Candidates require full question review before being called defects.</p><div id="unreported-list"></div></section>
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
