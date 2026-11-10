@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acadza-report-fix"
+version = "0.1.0"
+description = "Cost-conscious triage of student reports on exam questions"
+requires-python = ">=3.11"
+dependencies = [
+  "anthropic>=0.40,<1",
+  "pydantic>=2.8,<3",
+  "beautifulsoup4>=4.12,<5",
+  "lxml>=5,<7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+
+[tool.setuptools]
+packages = ["engine"]
