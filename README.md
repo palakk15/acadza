@@ -1,12 +1,12 @@
-# Run this project
+# Acadza Report → Fix
 
 This repository is a static faculty review console plus a Python triage engine. The console reads **precomputed** files and never calls an LLM from the browser. A local Groq API key is required only to run the engine and create `results.json`.
 
 ## Current build status
 
-The parser, deterministic checks, answer checks, safety guards, tests, and offline console are implemented. `results.json` has not been generated: no `GROQ_API_KEY` was available during this build, and model results are not fabricated. The console therefore labels verdicts and replies as pending. The all-question solver scan and `unreported_defects.json` are also pending a real model run.
+The parser, deterministic checks, answer checks, safety guards, Groq-backed triage engine, and responsive faculty console are implemented. The supplied dataset has 43 questions and 44 reports; `results.json` contains model-backed decisions for all 44 reports, grouped into 39 question cases. `data/internal_cases.json` contains deterministic findings and guard outcomes used by the console.
 
-The current no-LLM scan found 11 deterministic findings across 9 reported questions, including 4 records with malformed MathML. It found no candidate findings on unreported questions. These are review signals, not ground-truth defect labels.
+The completed evaluation reported 2 `auto_apply` proposals, 19 cases routed to `faculty_review`, and 23 to `no_change`. Those auto-apply proposals are suggestions for human review in this prototype; no production question data is changed. The optional scan for unreported defects has not been run yet, and there is no live deployment or screen recording in this repository.
 
 ## Run locally
 
@@ -31,7 +31,7 @@ Generate model-backed results (requires a funded API key and network access):
 .venv\Scripts\python.exe -m engine.evaluate
 ```
 
-The pipeline performs two separate cached blind solves and one grouped triage call for each reported question. Successful calls are cached under `data/llm_cache/`. It writes `results.json` and `data/internal_cases.json`. The solver does not receive the key, solution, or student comments. The default model is `openai/gpt-oss-120b`; set `GROQ_MODEL` to another Groq-supported tool-calling model if needed. If the API key is absent, the pipeline exits before making a request. `engine.run_unreported` reuses the cache where possible, solves every supplied question twice, and writes faculty-review candidates to `data/unreported_defects.json`.
+The pipeline performs two separate cached blind solves and one grouped triage call for each reported question. Successful calls are cached under `data/llm_cache/`. It writes `results.json` and `data/internal_cases.json`. The solver does not receive the key, stored solution, or student comments. The default model is `openai/gpt-oss-120b`; set `GROQ_MODEL` to another Groq-supported tool-calling model if needed. If the API key is absent, the pipeline exits before making a request. Temporary rate limits are retried, and malformed tool-call JSON gets a bounded retry. `engine.run_unreported` reuses the cache where possible, solves every supplied question twice, and writes faculty-review candidates to `data/unreported_defects.json`.
 
 ## Open the static console
 
@@ -41,7 +41,7 @@ Serve the repository root so the console can fetch the adjacent data and precomp
 .venv\Scripts\python.exe -m http.server 8000
 ```
 
-Open `http://localhost:8000/console/`. The console works without a key and displays the real question/report data. Until `results.json` exists, it clearly labels AI verdicts, confidence, proposed edits, guards, replies, and unreported candidates as pending. Faculty approve/reject/edit records and audit entries are demo-local in browser storage; they do not update Acadza's source database.
+Open `http://localhost:8000/console/`. The console works without a key and displays the question/report data and precomputed results. Faculty decisions and audit entries are stored in that browser only; they do not update Acadza's source database.
 
 For a static Vercel, Netlify, or GitHub Pages deployment, publish the **repository root** so `/data/questions.json`, `/data/reports.json`, and `/results.json` are available at the paths used by `console/app.js`. Include only generated, reviewed precomputed outputs. No secret is needed by the deployed console. A public URL and recording have not been created from this workspace.
 

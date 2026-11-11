@@ -1,0 +1,542 @@
+[
+  {
+    "reportId": "R001",
+    "questionId": "60f744b3f1b9bc7cc7b4a949",
+    "verdict": "defect",
+    "repair": "answer_key",
+    "edit": {
+      "field": "answer",
+      "find": "C",
+      "replace": "A"
+    },
+    "route": "faculty_review",
+    "confidence": 1.0,
+    "evidence": "Solution computes V = sqrt(40^2 + (60-30)^2) = 50 V, matching option A; stored answer C (130 V) is incorrect.",
+    "student_reply": "Correct, the solution shows 50 V, so the right answer is option A. We’ll fix the key from C to A."
+  },
+  {
+    "reportId": "R002",
+    "questionId": "60f744b3f1b9bc7cc7b4a949",
+    "verdict": "defect",
+    "repair": "answer_key",
+    "edit": {
+      "field": "answer",
+      "find": "C",
+      "replace": "A"
+    },
+    "route": "faculty_review",
+    "confidence": 1.0,
+    "evidence": "Solution computes V = sqrt(40^2 + (60-30)^2) = 50 V, matching option A; stored answer C (130 V) is incorrect.",
+    "student_reply": "You’re right, the supply voltage works out to 50 V, so option A is correct. The key was mistakenly set to C."
+  },
+  {
+    "reportId": "R003",
+    "questionId": "60f744b3f1b9bc7cc7b4a949",
+    "verdict": "defect",
+    "repair": "answer_key",
+    "edit": {
+      "field": "answer",
+      "find": "C",
+      "replace": "A"
+    },
+    "route": "faculty_review",
+    "confidence": 1.0,
+    "evidence": "Solution computes V = sqrt(40^2 + (60-30)^2) = 50 V, matching option A; stored answer C (130 V) is incorrect.",
+    "student_reply": "Exactly, √(40²+30²)=50 V, not 130 V. The answer key will be updated to A."
+  },
+  {
+    "reportId": "R004",
+    "questionId": "68e870ef42c06737d6e565c4",
+    "verdict": "defect",
+    "repair": "answer_key",
+    "edit": {
+      "field": "answer",
+      "find": "A",
+      "replace": "D"
+    },
+    "route": "faculty_review",
+    "confidence": 0.97,
+    "evidence": "Kinetic theory gives p = (1/3)·ρ·v^2 = (1/3)·0.09·400^2 = 4800 Pa, matching option D. Both stored solution and independent solvers confirm D; answer key A is incorrect.",
+    "student_reply": "Aapka observation samajh aata hai, lekin sahi jawab 4800 N/m² (option D) hai. Calculation (1/3)·ρ·v² se ye value milti hai."
+  },
+  {
+    "reportId": "R005",
+    "questionId": "68dea616d0cda73d07e93ae6",
+    "verdict": "defect",
+    "repair": "answer_key",
+    "edit": {
+      "field": "answer",
+      "find": "2",
+      "replace": "1"
+    },
+    "route": "faculty_review",
+    "confidence": 0.9,
+    "evidence": "Flux from q/2 on a face gives q/(4ε0) and from 2q at a corner gives q/(4ε0); total = q/(2ε0) = (n q)/(2ε0) → n=1. Solution matches this, answer key of 2 is wrong.",
+    "student_reply": "Hi, tum sahi ho—n ka value 1 hai. Answer key mein galti thi, ab theek kar diya hai."
+  },
+  {
+    "reportId": "R006",
+    "questionId": "696a866665252c04fc1f81c2",
+    "verdict": "defect",
+    "repair": "stem_data",
+    "edit": null,
+    "route": "faculty_review",
+    "confidence": 0.93,
+    "evidence": "The question does not specify the cube's edge length, so the initial volume is unknown. The stored solution assumes a 10 cm edge (0.001 m³) without stating it, leading to an incorrect answer key of 50. Both the missing data and the wrong answer indicate a defect in the stem.",
+    "student_reply": "Aap sahi keh rahe ho – cube ki edge length di hui nahi hai, isliye volume nikalna mumkin nahi. Solution mein 10 cm ka assumption hai jo question mein nahi likha."
+  },
+  {
+    "reportId": "R007",
+    "questionId": "60f742f6660d187cc13a8078",
+    "verdict": "defect",
+    "repair": "stem_data",
+    "edit": null,
+    "route": "faculty_review",
+    "confidence": 0.9,
+    "evidence": "The question statement gives only the resistance (40 Ω) and frequency (50 Hz) but does not specify the inductance L, which is required to compute the inductive reactance and thus the impedance. The stored solution uses an assumed L (≈95.5 mH) that is not mentioned in the stem, so the question is missing essential data.",
+    "student_reply": "Bilkul, inductance ki value hi nahi di gayi hai. Iski kami ko theek karne ke liye hum faculty se review karwayenge."
+  },
+  {
+    "reportId": "R008",
+    "questionId": "60f742f6660d187cc13a8078",
+    "verdict": "defect",
+    "repair": "stem_data",
+    "edit": null,
+    "route": "faculty_review",
+    "confidence": 0.9,
+    "evidence": "The question statement gives only the resistance (40 Ω) and frequency (50 Hz) but does not specify the inductance L, which is required to compute the inductive reactance and thus the impedance. The stored solution uses an assumed L (≈95.5 mH) that is not mentioned in the stem, so the question is missing essential data.",
+    "student_reply": "Aap sahi keh rahe hain, question mein zaroori data missing hai, isliye answer nikalna mushkil hai. Hum isko faculty ko bhej rahe hain."
+  },
+  {
+    "reportId": "R009",
+    "questionId": "622f08d7b70e4b50e4500a1b",
+    "verdict": "defect",
+    "repair": "option_repair",
+    "edit": null,
+    "route": "faculty_review",
+    "confidence": 0.98,
+    "evidence": "The question lists only three answer options (A, B, C) whereas a standard SCQ should have four; student reports confirm option D is missing.",
+    "student_reply": "Aapka observation theek hai, option D missing hai. Yeh issue faculty ko forward kar diya gaya hai."
+  },
+  {
+    "reportId": "R010",
+    "questionId": "622f08d7b70e4b50e4500a1b",
+    "verdict": "defect",
+    "repair": "option_repair",
+    "edit": null,
+    "route": "faculty_review",
+    "confidence": 0.98,
+    "evidence": "The question lists only three answer options (A, B, C) whereas a standard SCQ should have four; student reports confirm option D is missing.",
+    "student_reply": "Aapne sahi notice kiya—question mein sirf teen options dikh rahe hain, chautha option hona chahiye. Hum isko faculty ko bhej rahe hain sudhar ke liye."
+  },
+  {
+    "reportId": "R011",
+    "questionId": "68e872546e45ba37dcc16bc0",
+    "verdict": "defect",
+    "repair": "option_repair",
+    "edit": null,
+    "route": "faculty_review",
+    "confidence": 1.0,
+    "evidence": "Option C is blank and the answer key points to it, but the correct force ratio is 1:1 which is not among the options.",
+    "student_reply": "Option C blank hai, aur sahi ratio 1:1 hoti hai jo kisi option mein nahi hai, isliye answer key galat hai."
+  },
+  {
+    "reportId": "R012",
+    "questionId": "61dffbec08489156b684bd22",
+    "verdict": "defect",
+    "repair": "spelling",
+    "edit": {
+      "field": "question",
+      "find": "Epithellial tisue",
+      "replace": "Epithelial tissue"
+    },
+    "route": "auto_apply",
+    "confidence": 1.0,
+    "evidence": "Option A contains the misspelled phrase \"Epithellial tisue\"; correct spelling is \"Epithelial tissue\".",
+    "student_reply": "Thanks for catching the typo! We'll correct \"Epithellial tisue\" to \"Epithelial tissue\"."
+  },
+  {
+    "reportId": "R013",
+    "questionId": "617fa18efd53ff1629ed890f",
+    "verdict": "no_error",
+    "repair": "exam_reference",
+    "edit": {
+      "field": "question",
+      "find": "(NEET 2019) ",
+      "replace": ""
+    },
+    "route": "no_change",
+    "confidence": 0.95,
+    "evidence": "Student asked why the NEET 2019 tag is in the question; it is an exam reference tag that can be safely removed as a low‑severity noise issue.",
+    "student_reply": "Hi, exam tag sirf source batane ke liye hota hai, isliye ise hata diya gaya hai. Answer D hi sahi hai."
+  },
+  {
+    "reportId": "R014",
+    "questionId": "63765a28f1d8416ae0408d89",
+    "verdict": "display_issue",
+    "repair": "markup_leak",
+    "edit": {
+      "field": "question",
+      "find": "\\\\frac{7}{8}",
+      "replace": "7/8"
+    },
+    "route": "faculty_review",
+    "confidence": 0.98,
+    "evidence": "Raw LaTeX \\frac appears in question text, causing markup leak.",
+    "student_reply": "Thanks for pointing it out! We've fixed the LaTeX rendering so the fraction now appears correctly."
+  },
+  {
+    "reportId": "R015",
+    "questionId": "6956d79788d7701e5617bc29",
+    "verdict": "defect",
+    "repair": "identical_options",
+    "edit": null,
+    "route": "faculty_review",
+    "confidence": 0.99,
+    "evidence": "Options B and C both read '0 W', so they are identical.",
+    "student_reply": "Bilkul sahi, option B aur C dono '0 W' likhte hain. Hum isko faculty ko bhej rahe hain taaki theek kiya ja sake."
+  },
+  {
+    "reportId": "R016",
+    "questionId": "6263d75bdd44e265ef926d97",
+    "verdict": "defect",
+    "repair": "solution_fix",
+    "edit": {
+      "field": "solution",
+      "find": "a = 40 cm",
+      "replace": "a = 20 cm"
+    },
+    "route": "faculty_review",
+    "confidence": 0.9,
+    "evidence": "Stored solution states a = 40 cm, but independent blind solvers and the stored answer both give side length 20 cm; the solution's numeric result is wrong.",
+    "student_reply": "Correct answer hai 20 cm, solution mein galti se 40 cm likh diya tha."
+  },
+  {
+    "reportId": "R017",
+    "questionId": "6208e80a9cb2ab67dac61bd0",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 0.95,
+    "evidence": "Student mentioned a spelling mistake 'mere' in options, but none of the options contain that word; the options are correctly spelled and the answer key C is accurate.",
+    "student_reply": "Thanks for pointing it out! Actually, there is no spelling mistake in the options, and the answer C (green light) is correct."
+  },
+  {
+    "reportId": "R018",
+    "questionId": "612151a6a34397610a9a2e58",
+    "verdict": "defect",
+    "repair": "solution_fix",
+    "edit": {
+      "field": "solution",
+      "find": "<h3><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mstyle displaystyle=\"true\"><mrow><mo>&#x0003D;</mo><mn>5.469</mn><mi>&#x000D7;</mi><msup><mn>10</mn><mrow><mo>&#x02212;</mo><mn>10</mn></mrow></msup><mi>m</mi><mo>&#x0003D;</mo><mn>5.47</mn><mi>\\AA</mi></mrow></mstyle></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mstyle displaystyle=\"true\"><mrow><mi>&#x003BB;</mi><mo>&#x0003D;</mo><mfrac><mrow><mi>h</mi></mrow><mrow><mo stretchy=\\\"false\\\">&#x0007C;</mo><mi>p</mi><mo stretchy=\\\"false\\\">&#x0007C;</mo></mrow></mfrac><mo>&#x0003D;</mo><mfrac><mrow><mi>h</mi></mrow><mrow><mo stretchy=\\\"false\\\">&#x0007C;</mo><mi>I</mi><mo stretchy=\\\"false\\\">&#x0007C;</mo></mrow></mfrac></mrow></mstyle></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mstyle displaystyle=\"true\"><mrow><mo>&#x0003D;</mo><mn>2.65</mn><mi>&#x000D7;</mi><msup><mn>10</mn><mrow><mo>&#x02212;</mo><mn>18</mn></mrow></msup><mi>J</mi></mrow></mstyle></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mstyle displaystyle=\"true\"><mrow><mo>&#x0003D;</mo><mn>16.8</mn><mi>e</mi><mi>V</mi></mrow></mstyle></math></h3>",
+      "replace": "<p>Using de‑Broglie relation λ = h/p ⇒ p = h/λ. Kinetic energy K = p²/(2m_e).\nSubstituting h = 6.626×10⁻³⁴ J·s, λ = 0.3 nm = 3×10⁻¹⁰ m, m_e = 9.11×10⁻³¹ kg gives\nK ≈ (6.626×10⁻³⁴ / 3×10⁻¹⁰)² / (2·9.11×10⁻³¹) ≈ 2.68×10⁻¹⁸ J = 16.8 eV.</p>"
+    },
+    "route": "faculty_review",
+    "confidence": 0.96,
+    "evidence": "The stored solution shows unrelated calculations (5.47 Å) and does not address the kinetic‑energy question; blind solvers correctly compute 16.8 eV (option B).",
+    "student_reply": "Hi! Aapka observation sahi hai – jo solution dikh raha tha wo is question se bilkul alag tha. Humne sahi solution laga diya hai."
+  },
+  {
+    "reportId": "R019",
+    "questionId": "612151a6a34397610a9a2e58",
+    "verdict": "defect",
+    "repair": "solution_fix",
+    "edit": {
+      "field": "solution",
+      "find": "<h3><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mstyle displaystyle=\"true\"><mrow><mo>&#x0003D;</mo><mn>5.469</mn><mi>&#x000D7;</mi><msup><mn>10</mn><mrow><mo>&#x02212;</mo><mn>10</mn></mrow></msup><mi>m</mi><mo>&#x0003D;</mo><mn>5.47</mn><mi>\\AA</mi></mrow></mstyle></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mstyle displaystyle=\"true\"><mrow><mi>&#x003BB;</mi><mo>&#x0003D;</mo><mfrac><mrow><mi>h</mi></mrow><mrow><mo stretchy=\\\"false\\\">&#x0007C;</mo><mi>p</mi><mo stretchy=\\\"false\\\">&#x0007C;</mo></mrow></mfrac><mo>&#x0003D;</mo><mfrac><mrow><mi>h</mi></mrow><mrow><mo stretchy=\\\"false\\\">&#x0007C;</mo><mi>I</mi><mo stretchy=\\\"false\\\">&#x0007C;</mo></mrow></mfrac></mrow></mstyle></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mstyle displaystyle=\"true\"><mrow><mo>&#x0003D;</mo><mn>2.65</mn><mi>&#x000D7;</mi><msup><mn>10</mn><mrow><mo>&#x02212;</mo><mn>18</mn></mrow></msup><mi>J</mi></mrow></mstyle></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mstyle displaystyle=\"true\"><mrow><mo>&#x0003D;</mo><mn>16.8</mn><mi>e</mi><mi>V</mi></mrow></mstyle></math></h3>",
+      "replace": "<p>Using de‑Broglie relation λ = h/p ⇒ p = h/λ. Kinetic energy K = p²/(2m_e).\nSubstituting h = 6.626×10⁻³⁴ J·s, λ = 0.3 nm = 3×10⁻¹⁰ m, m_e = 9.11×10⁻³¹ kg gives\nK ≈ (6.626×10⁻³⁴ / 3×10⁻¹⁰)² / (2·9.11×10⁻³¹) ≈ 2.68×10⁻¹⁸ J = 16.8 eV.</p>"
+    },
+    "route": "faculty_review",
+    "confidence": 0.96,
+    "evidence": "The stored solution shows unrelated calculations (5.47 Å) and does not address the kinetic‑energy question; blind solvers correctly compute 16.8 eV (option B).",
+    "student_reply": "Namaste! Solution mein 5.47 Å aana galat tha, isliye humne naya sahi solution update kar diya hai."
+  },
+  {
+    "reportId": "R020",
+    "questionId": "68c8153cfb6b2f16e2d3ceaf",
+    "verdict": "defect",
+    "repair": "answer_key",
+    "edit": {
+      "field": "answer",
+      "find": "A, B, D",
+      "replace": "[\"A\", \"B\", \"D\"]"
+    },
+    "route": "faculty_review",
+    "confidence": 0.98,
+    "evidence": "Stored answer is a single string \"A, B, D\" which violates MCQ format; deterministic finding flagged invalid_answer. Blind solvers agree correct options are A, B, D, so answer key content is correct but malformed.",
+    "student_reply": "A B D hi sahi jawab hai, aapka answer key format galat tha."
+  },
+  {
+    "reportId": "R021",
+    "questionId": "68f21caf941cda588bc04365",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "Stored solution derives τ = 3 / ln(8) ≈ 1.44 min, matching option B; blind solvers also give B. No error in question or answer.",
+    "student_reply": "B hi sahi answer hai—calculation se mean life ≈1.44 min milti hai, jo option B hai. Negative aane ki galti shayad sign ka dhyan na dene ki thi."
+  },
+  {
+    "reportId": "R022",
+    "questionId": "61ee6c9d90a1a968a168686b",
+    "verdict": "defect",
+    "repair": "spelling",
+    "edit": {
+      "field": "question",
+      "find": "plexux",
+      "replace": "plexus"
+    },
+    "route": "auto_apply",
+    "confidence": 1.0,
+    "evidence": "Student reported that option D contains a misspelling: 'plexux' should be 'plexus'.",
+    "student_reply": "Thanks for catching that! We've fixed the typo in option D, changing 'plexux' to 'plexus'."
+  },
+  {
+    "reportId": "R023",
+    "questionId": "68ecbacb2ec87a18deba1ad7",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "The absolute refractory period is caused by inactivation of voltage-gated Na⁺ channels, which matches option B and the stored solution. The question and answer are correct.",
+    "student_reply": "Your concern is understandable, but the question is about the absolute refractory period, which is correctly explained by Na⁺ channel inactivation (option B). The chapter label does not affect the correctness of the question."
+  },
+  {
+    "reportId": "R024",
+    "questionId": "5fc60508028950133eac8963",
+    "verdict": "no_error",
+    "repair": "answer_form",
+    "edit": {
+      "field": "question",
+      "find": "frictional force is equal to",
+      "replace": "frictional force is equal to (in N)"
+    },
+    "route": "no_change",
+    "confidence": 0.9,
+    "evidence": "Question does not specify the unit for frictional force; adding '(in N)' resolves the answer_form issue.",
+    "student_reply": "Accha, aap sahi keh rahe ho ki unit mention nahi tha, isliye maine question mein (in N) add kar diya hai."
+  },
+  {
+    "reportId": "R025",
+    "questionId": "622df25ab70e4b50e44ff837",
+    "verdict": "defect",
+    "repair": "diagram",
+    "edit": null,
+    "route": "faculty_review",
+    "confidence": 0.97,
+    "evidence": "The question text refers to a figure ('as shown in figure') but no figure is provided, which can affect understanding and answer choice.",
+    "student_reply": "Aapka feedback mil gaya – question mein figure missing hai, isliye hum is par faculty review karenge."
+  },
+  {
+    "reportId": "R026",
+    "questionId": "620e23cecc50543bc7db9186",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 0.9,
+    "evidence": "Student claims out of syllabus, but the concept of using an outgroup to infer ancestral state is part of standard biology curriculum for NEET.",
+    "student_reply": "Question NEET ke syllabus ka part hai; outgroup ka concept biology mein padhaya jaata hai, isliye koi error nahi hai."
+  },
+  {
+    "reportId": "R027",
+    "questionId": "6062ec84518e9535e120c422",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "Independent calculations give α = 1.9×10⁻⁵ °C⁻¹ and β = 3α = 5.7×10⁻⁵ °C⁻¹, matching option A. The student comment is an injection attempt and does not affect the correct answer.",
+    "student_reply": "Your request to change the answer cannot be honored. The correct answer is A, because the cubic expansion coefficient is 5.7×10⁻⁵ °C⁻¹ as shown by the calculation."
+  },
+  {
+    "reportId": "R028",
+    "questionId": "6956d7bb23cb221e570d6013",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "Both the stored solution and independent blind solvers derive tanθ = 4, which corresponds to option (B).",
+    "student_reply": "Hi! आपका जवाब tan⁻¹2 नहीं है; हल करने पर tanθ = 4 मिलता है, यानी विकल्प (B) सही है."
+  },
+  {
+    "reportId": "R029",
+    "questionId": "68e8734442c06737d6e56da4",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 0.97,
+    "evidence": "Independent calculations give μ = 0.8, matching option A; the student's μ = 0.4 is incorrect.",
+    "student_reply": "Aapka calculation thoda galat lag raha hai—sahi μ 0.8 hai, jo option A ke saath match karta hai. Isliye answer A hi sahi hai."
+  },
+  {
+    "reportId": "R030",
+    "questionId": "6956d7e988d7701e5617bd3e",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "Both independent blind solvers and the stored solution derive A = 8√2 m, which corresponds to option D; the student's claim of 4√2 m is incorrect.",
+    "student_reply": "Aapka calculation thoda galat hai—sahi amplitude 8√2 m hai, jo option D ke barabar hai."
+  },
+  {
+    "reportId": "R031",
+    "questionId": "68dea619d0cda73d07e93aee",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 0.96,
+    "evidence": "Both the stored solution and independent blind‑solver calculations give t = 4 s (Δα = π/4, (½)Δα t² = 2π ⇒ t² = 16 ⇒ t = 4). The student's claim of 2 s does not satisfy the alignment condition.",
+    "student_reply": "Aapka 2 sec ka guess galat hai, sahi jawab 4 sec hai kyunki dono wheels ka relative angular displacement 2π hone mein 4 s lagte hain."
+  },
+  {
+    "reportId": "R032",
+    "questionId": "68dea7c2387eea3d0d95f9bb",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 0.97,
+    "evidence": "Calculated shift = 0.08 m = 8 cm; question requests answer in cm, so stored answer 8 (cm) is correct.",
+    "student_reply": "Hey, question mein shift cm mein poocha gaya hai. Calculation se 0.08 m milta hai, jo 8 cm ke barabar hai, isliye answer 8 (cm) hi sahi hai."
+  },
+  {
+    "reportId": "R033",
+    "questionId": "68dea715387eea3d0d95f790",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 0.9,
+    "evidence": "Side length 7.203 m (4 significant figures) gives total surface area A = 6*(7.203)^2 = 311.299 m^2, which rounded to 4 s.f. is 311.3 m^2. Multiplying by 10 yields 3113. The stored answer matches this; the student's 3112.99 is the unrounded product and does not follow the required significant‑figure rounding.",
+    "student_reply": "Hi! Answer 3113 hi sahi hai kyunki question mein significant figures ko consider karna tha. 3112.99 unrounded value hai, lekin humein 311.3 m² (4 s.f.) leke 10 se multiply karna tha."
+  },
+  {
+    "reportId": "R034",
+    "questionId": "695ee00b88d7701e561aabc5",
+    "verdict": "defect",
+    "repair": "unsound",
+    "edit": null,
+    "route": "faculty_review",
+    "confidence": 0.95,
+    "evidence": "For equal-amplitude waves with a π/2 phase difference, resultant intensity I = 4 I0 cos^2(π/4) = 2 I0, i.e., twice the intensity of one wave, so Assertion A is false. Reason R claims the resultant intensity is always the sum of individual intensities for any non‑zero phase difference, which is incorrect; it only holds for this specific case, not generally. Hence both A and R are false, but none of the provided options reflect this, making the question defective.",
+    "student_reply": "Hey, I see why you think assertion is true, but actually with a 90° phase difference the intensity becomes twice one wave, so the assertion is false and the reason is also not generally correct. The question itself doesn’t have a correct option."
+  },
+  {
+    "reportId": "R035",
+    "questionId": "66fe9dbe22132e5a70a3e579",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "Relaxin (reproductive/vascular) and inhibin (FSH regulation) act on unrelated pathways and do not oppose each other's actions, unlike the other listed pairs which have opposite physiological effects. Hence option D is correctly the non‑antagonistic pair.",
+    "student_reply": "Hey, relaxin aur inhibin alag-alag systems par kaam karte hain – ek reproductive tissue ko affect karta hai, doosra FSH ko regulate karta hai – isliye ye opposite nahi hote. Isiliye D sahi answer hai."
+  },
+  {
+    "reportId": "R036",
+    "questionId": "60ca4feb6420652745f55522",
+    "verdict": "display_issue",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "Student reports that the options are cut off on their phone screen, indicating a rendering/display problem rather than an error in the question or answer.",
+    "student_reply": "Thanks for letting us know! It looks like the options are getting cut off on some devices – that's a display issue. We'll work on fixing the layout."
+  },
+  {
+    "reportId": "R037",
+    "questionId": "68c9ae5afb6b2f16e2d43b1c",
+    "verdict": "display_issue",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "Student reports slow loading time; question, options, solution and answer key are correct.",
+    "student_reply": "Sorry for the delay! We'll check the loading speed, but the question itself is fine."
+  },
+  {
+    "reportId": "R038",
+    "questionId": "68f21df0941cda588bc0470b",
+    "verdict": "app_issue",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "Physics shows KE ∝ p², so quadrupling KE doubles momentum. Stored answer A matches this, and solution states the same. Student's comment describes a platform saving issue, not content error.",
+    "student_reply": "Aap sahi answer A select kiya tha, lekin app mein recording mein dikkat aayi lagti hai. Hamare team ko bata denge, taki aapka response theek se save ho jaye."
+  },
+  {
+    "reportId": "R039",
+    "questionId": "68c801bc1b1dbc16dc93bf2b",
+    "verdict": "language_mode",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "The student request is to have the question in Hindi; this is a language request, not an error in the question itself.",
+    "student_reply": "Sorry, is question ko Hindi mein provide nahi kar sakte. Aapke feedback ka dhanyavaad!"
+  },
+  {
+    "reportId": "R040",
+    "questionId": "6264197209f4fd65f58f5707",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "Blind solvers and stored answer both indicate option C (Golden rice) is correct; the student's comment provides no contrary evidence.",
+    "student_reply": "Aapka comment mil gaya, lekin sahi jawab Golden rice (C) hi hai. Koshish jaari rakho!"
+  },
+  {
+    "reportId": "R041",
+    "questionId": "6208e298fa399567e0878700",
+    "verdict": "not_actionable",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 1.0,
+    "evidence": "Student comment is gibberish and does not indicate any problem with the question or answer.",
+    "student_reply": "Hey, thanks for your comment. Lagta hai aapka message thoda unclear tha, isliye hum koi issue identify nahi kar paaye."
+  },
+  {
+    "reportId": "R042",
+    "questionId": "63c7cce12981ed154ee92c94",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 0.99,
+    "evidence": "The student's comment about chapter and optics is unrelated; the physics question and solution are correct, and both independent solvers confirm option C (2.2 μA) as the right answer.",
+    "student_reply": "Hi! The question belongs to electromagnetism, not optics, and the displacement current calculation is correct. Option (C) 2.2 μA is the right answer, so there’s no issue with the question."
+  },
+  {
+    "reportId": "R043",
+    "questionId": "636283dbe3770c24f866e6d6",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 0.99,
+    "evidence": "Stored solution and independent blind solvers both derive σ_big/σ_small = 4:1, matching stored answer B. Student's claim of 1:4 is incorrect.",
+    "student_reply": "Hey, tumhara observation samajh aata hai, lekin calculation se surface charge density ka ratio 4:1 hota hai, isliye stored answer B sahi hai."
+  },
+  {
+    "reportId": "R044",
+    "questionId": "68dea577d0cda73d07e9391c",
+    "verdict": "no_error",
+    "repair": null,
+    "edit": null,
+    "route": "no_change",
+    "confidence": 0.97,
+    "evidence": "Independent blind‑solver calculations give V(P)=22 V and V(S)=8 V, so V(P)-V(S)=14 V, which matches the stored answer and solution.",
+    "student_reply": "Hi! The correct potential difference is 14 V. Using the formula for a uniformly charged solid sphere gives V(P)=22 V and V(S)=8 V, so the difference is 22‑8 = 14 V."
+  }
+]

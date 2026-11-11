@@ -6,3 +6,8 @@ __pycache__/
 .tools/
 .cache/
 data/llm_cache/
+
+# Local browser preview screenshots and accidental shell artifacts
+*-preview.png
+console-preview.png
+x.href)*

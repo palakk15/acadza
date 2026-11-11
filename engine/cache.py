@@ -17,11 +17,18 @@ class DiskCache:
         packed = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
         return hashlib.sha256(packed.encode("utf-8")).hexdigest()
 
+    def get(self, payload: Any) -> Any | None:
+        path = self.root / f"{self.key(payload)}.json"
+        if path.exists():
+            return json.loads(path.read_text(encoding="utf-8"))
+        return None
+
     def get_or_create(self, payload: Any, create: Callable[[], Any]) -> tuple[Any, bool]:
         key = self.key(payload)
         path = self.root / f"{key}.json"
-        if path.exists():
-            return json.loads(path.read_text(encoding="utf-8")), True
+        cached = self.get(payload)
+        if cached is not None:
+            return cached, True
         value = create()
         self.root.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")

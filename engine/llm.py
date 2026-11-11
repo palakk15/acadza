@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import json
 import os
+import re
+import time
 from pathlib import Path
 from typing import Any
 
-from groq import Groq
+from groq import Groq, RateLimitError
 
 from .cache import DiskCache
 from .comments import quote_comment
@@ -72,29 +74,68 @@ class GroqCalls:
 
     def _tool_call(self, operation: str, system: str, user_payload: Any, schema: dict[str, Any]) -> tuple[dict, bool]:
         request = {"model": self.model, "operation": operation, "system": system, "input": user_payload, "schema": schema}
+        fallback_request = {**request, "retry": {"max_completion_tokens": 4096, "reasoning_effort": "low"}}
 
-        def call() -> dict:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                max_completion_tokens=1800,
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
-                ],
-                tools=[{"type": "function", "function": {
-                    "name": "submit_result",
-                    "description": "Return the requested structured result.",
-                    "parameters": schema,
-                }}],
-                tool_choice={"type": "function", "function": {"name": "submit_result"}},
-            )
+        # If a previous run needed the longer bounded retry, avoid making the
+        # same failing short request again.
+        fallback_cached = self.cache.get(fallback_request)
+        if fallback_cached is not None:
+            return fallback_cached, True
+
+        def call(max_tokens: int = 1800, reasoning_effort: str | None = None) -> dict:
+            options = {"max_completion_tokens": max_tokens}
+            if reasoning_effort:
+                options["reasoning_effort"] = reasoning_effort
+            for attempt in range(5):
+                try:
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        **options,
+                        messages=[
+                            {"role": "system", "content": system},
+                            {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
+                        ],
+                        tools=[{"type": "function", "function": {
+                            "name": "submit_result",
+                            "description": "Return the requested structured result.",
+                            "parameters": schema,
+                        }}],
+                        tool_choice={"type": "function", "function": {"name": "submit_result"}},
+                    )
+                    break
+                except RateLimitError as error:
+                    if attempt == 4:
+                        raise
+                    body = getattr(error, "body", None)
+                    details = body.get("error", body) if isinstance(body, dict) else {}
+                    message = details.get("message", "") if isinstance(details, dict) else ""
+                    delay = min(30.0, 2.0 ** attempt)
+                    match = re.search(r"try again in ([0-9.]+)(ms|s)", message, re.IGNORECASE)
+                    if match:
+                        delay = min(30.0, float(match.group(1)) / (1000 if match.group(2).lower() == "ms" else 1))
+                    time.sleep(max(0.5, delay))
             message = response.choices[0].message
             for call in message.tool_calls or []:
                 if call.function.name == "submit_result":
                     return json.loads(call.function.arguments)
             raise RuntimeError("Groq returned no structured tool result.")
 
-        return self.cache.get_or_create(request, call)
+        try:
+            return self.cache.get_or_create(request, call)
+        except Exception as error:
+            body = getattr(error, "body", None)
+            if isinstance(body, dict):
+                details = body.get("error", body)
+                code = details.get("code") if isinstance(details, dict) else None
+                message = details.get("message", "") if isinstance(details, dict) else ""
+            else:
+                code, message = None, str(error)
+            if code != "tool_use_failed" or "parse tool call arguments as JSON" not in message:
+                raise
+            return self.cache.get_or_create(
+                fallback_request,
+                lambda: call(max_tokens=4096, reasoning_effort="low"),
+            )
 
     def solve_blindly(self, question: dict[str, Any], run_number: int = 1) -> tuple[dict, bool]:
         system = (self.prompts / "solver_v1.md").read_text(encoding="utf-8")
