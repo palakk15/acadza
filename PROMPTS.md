@@ -39,28 +39,54 @@ Return data matching the supplied JSON schema. Evidence must be concise and base
 
 ## Prompt versions
 
-`v1` is the initial pair: the solver is blinded from the key/solution/comments; the grouped triage stage receives deterministic checks, both solver outputs, stored answer/solution, and explicitly quoted comments. Structured output is constrained with the taxonomy keys in code. See [`prompts/CHANGELOG.md`](prompts/CHANGELOG.md). No prompt revision has been made because the model pipeline has not run; there are no real responses to evaluate yet.
+`v1` is the current prompt pair. The solver sees only the question type and question content; it does not see the stored answer, solution, or student comments. Triage runs after both blind solves and receives the stored data, deterministic findings, solver outputs, and student reports. Code enforces the allowed taxonomy and safety checks. The full prompt history is in [`prompts/CHANGELOG.md`](prompts/CHANGELOG.md).
+
+The prompts have not needed a wording revision yet. I did run the pipeline on all 44 reports with Groq. One response exceeded the tool-call JSON limit, so I handled that in the client with a bounded retry rather than quietly accepting incomplete output. The completed run produced `results.json`; it is not an accuracy score against ground truth.
 
 ## Prompts I gave my AI coding assistant
 
-**Placeholder for me to fill.** Paste the key instructions I gave the coding assistant verbatim here, including this project request if appropriate. Do not claim that the assistant authored or followed instructions that are not recorded.
+These are verbatim excerpts from my original project instructions and follow-up requests. I selected the parts that most shaped the implementation; the full assignment brief is in `README.md`.
+
+### Original instructions
+
+> You are my senior engineer and mentor. I am a beginner in machine learning, so build this properly AND explain as you go.
+
+> Never invent results. results.json must come from actually running the pipeline. If you cannot run the LLM (no API key), say so and stop; do not fake outputs.
+
+> Keep LLM cost low: deterministic code first, LLM only when needed, group reports by question, cache every LLM call on disk keyed by a hash of the input.
+
+> Keep code small, readable and commented for a beginner. No unnecessary frameworks.
+
+### Follow-up requests
+
+> change it to groq api key
+
+> also then run it
+
+> make the ui more better and easy to navigate and there should be no overlapping
+
+> push the complete code here and add a readme
+
+I began with the assignment's Anthropic-based stack, then switched the provider after I asked to use Groq. The product prompts stayed provider-neutral.
 
 ## Three moments the AI was wrong and how I caught it
 
-**Placeholders for me to fill from my own review.** The development log [`ai_mistakes_log.md`](ai_mistakes_log.md) records implementation mistakes caught by automated checks; convert these into your own interview stories and add a third only if you personally observed one.
+These examples come from the development log in [`ai_mistakes_log.md`](ai_mistakes_log.md).
 
-1. **[Your example, what looked wrong, and how you verified it.]**
-2. **[Your example, what looked wrong, and how you verified it.]**
-3. **[Your example, what looked wrong, and how you verified it.]**
+1. **The parser missed answer choices joined directly to the stem.** Its first scan reported 26 questions with no options. I checked the source HTML and found choices attached without whitespace, such as `50 V(B)`. We removed the parser's “must have a separator” assumption and reran it; it then recognized options on 32 records.
+
+2. **Two safety checks failed their first adversarial tests.** The junk filter treated the valid comment `wrong` as gibberish, while the forgiving HTML parser repaired malformed MathML before the guard could detect it. The first test run exposed both failures. We narrowed the junk rule and validated the original MathML fragment strictly before normal HTML parsing.
+
+3. **The console opened the wrong case first.** A browser check showed `25 / 39` even though the queue was sorted by urgency. The selected item came from source-file order, not the visible queue order. We changed initial selection to use the first urgency-sorted item and checked the page again.
 
 ## Design decisions log
 
-- **Separate passes:** the blind solve only gets question type and question HTML. It cannot copy the supplied answer, solution, or student theory. The triage step sees that evidence afterwards. This costs more calls than one prompt but exposes disagreement.
-- **Group before calling the model:** repeated reports for one question share the two solves and the triage decision. The triage response provides one student reply per report.
-- **Deterministic checks first:** content shape, answer type, obvious noise/markup, and edit feasibility are checked in code. The model is reserved for subject reasoning and ambiguous reports.
-- **Closed taxonomy:** prompts receive allowed keys and the code validates them again. Repair field scope and routing policy are checked in `engine/guards.py`.
-- **Strict auto-apply posture:** auto-route requires a taxonomy repair marked auto, a unique small edit, confidence at least 0.95, valid MathML, and all repair-specific checks. Answer changes need two agreeing blind solves plus an explicit matching answer extracted from the solution; uncertain extraction routes to faculty.
-- **Cache by exact request hash:** successful model responses are stored under `data/llm_cache/`; changing the prompt, model, input, or schema changes the key. Student IDs are not sent to the model.
-- **Static console:** the UI reads JSON files and has no model key or API call. Local review actions are a demo audit trail, not writes to Acadza's database.
-- **Parser choice:** an initial small standard-library parser was replaced with BeautifulSoup + lxml so production HTML is parsed with the requested HTML parser and MathML subtrees remain renderable.
-- **What is still unproven:** the LLM has not been run in this workspace. We have not compared results to ground truth, calibrated the confidence threshold, or claimed any model accuracy. The current threshold is a conservative starting policy, not an empirically tuned value.
+- **Solve before triage:** two blind solves give the triage step independent evidence. They cannot copy the stored key, solution, or a student's claim. This costs more calls than one prompt, but makes disagreements visible.
+- **Group reports by question:** duplicate reports share one pair of solves and one triage decision, while the model still writes a reply for each report. The supplied 44 reports become 39 question cases.
+- **Use code for predictable checks:** parsing, answer-type checks, malformed markup, comment flags, edit scope, and routing rules are easier to test in Python than to rely on prompt wording for.
+- **Constrain model output:** triage receives the taxonomy, returns schema-shaped data, and is validated again in code. A repair marked non-automatic cannot reach `auto_apply`.
+- **Keep automatic edits narrow:** an auto proposal needs an allowed repair, a unique and small edit, confidence of at least 0.95, valid MathML, and repair-specific checks. Answer-key changes need agreement between blind solves and an explicit matching answer in the stored solution; otherwise they go to faculty.
+- **Cache exact requests:** successful outputs are stored under `data/llm_cache/`. Changing the model, prompt, input, or schema creates a new cache key. Student IDs are not sent to the model.
+- **Keep the console static:** it reads precomputed JSON and contains no API key or model call. Review actions live in browser storage and do not change Acadza's source data.
+- **Use a real HTML parser:** BeautifulSoup and lxml replaced an early standard-library parser so production HTML and MathML could be handled more reliably.
+- **Be honest about limits:** the pipeline produced decisions for all 44 reports, but the evaluation script only summarizes verdicts and routes. We have not scored accuracy against the assignment's ground-truth labels or tuned the confidence threshold. The optional scan for defects on unreported questions has not been run.
