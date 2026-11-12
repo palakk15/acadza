@@ -41,11 +41,11 @@ Return data matching the supplied JSON schema. Evidence must be concise and base
 
 `v1` is the current prompt pair. The solver sees only the question type and question content; it does not see the stored answer, solution, or student comments. Triage runs after both blind solves and receives the stored data, deterministic findings, solver outputs, and student reports. Code enforces the allowed taxonomy and safety checks. The full prompt history is in [`prompts/CHANGELOG.md`](prompts/CHANGELOG.md).
 
-The prompts have not needed a wording revision yet. I did run the pipeline on all 44 reports with Groq. One response exceeded the tool-call JSON limit, so I handled that in the client with a bounded retry rather than quietly accepting incomplete output. The completed run produced `results.json`; it is not an accuracy score against ground truth.
+The prompts have not needed a wording revision yet. I ran the pipeline on all 44 reports using the configured model. One response exceeded the tool-call JSON limit, so I handled that in the client with a bounded retry rather than accepting incomplete output. The completed run produced `results.json`; it is not an accuracy score against ground truth.
 
 ## Prompts I gave my AI coding assistant
 
-These are verbatim excerpts from my original project instructions and follow-up requests. I selected the parts that most shaped the implementation; the full assignment brief is in `README.md`.
+The original instructions below are quoted verbatim. The follow-up items are concise summaries of my later requests; I have labelled them as summaries rather than rewriting them as direct quotes. The full assignment brief is in `README.md`.
 
 ### Original instructions
 
@@ -57,17 +57,15 @@ These are verbatim excerpts from my original project instructions and follow-up 
 
 > Keep code small, readable and commented for a beginner. No unnecessary frameworks.
 
-### Follow-up requests
+### Follow-up request summaries
 
-> change it to groq api key
-
-> also then run it
-
-> make the ui more better and easy to navigate and there should be no overlapping
-
-> push the complete code here and add a readme
-
-I began with the assignment's Anthropic-based stack, then switched the provider after I asked to use Groq. The product prompts stayed provider-neutral.
+- **Run the real pipeline:** After the API key is configured, run the pipeline on the supplied reports. Show the real output or exact error, and never fill gaps with invented results.
+- **Make local setup easy to follow:** Explain where `.env` belongs, how it differs from `.env.example`, and how to keep credentials private. Give me clear steps that assume I am new to this workflow.
+- **Run and show the console:** Start the project and open the faculty review page with its generated report data, so I can inspect the working result rather than just read instructions.
+- **Improve the review console:** Make the queue and case details easier to navigate. Keep the layout responsive, readable, and free of clipped text or overlapping cards and controls.
+- **Check the fix in my browser:** When I say the Chrome page still looks wrong, use the screenshot and the page actually being served to diagnose it. Confirm the updated layout reaches the browser before calling the issue fixed.
+- **Explain the results:** Help me understand the verdicts and routes, which suggestions need faculty review, and what action makes sense next. Make clear that a proposal does not change Acadza's data.
+- **Keep guidance beginner-friendly:** Explain technical decisions in plain language and give me the next action I can take without assuming I already know the tools.
 
 ## Three moments the AI was wrong and how I caught it
 
